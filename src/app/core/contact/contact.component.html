@@ -1,0 +1,121 @@
+<nav aria-label="breadcrumb">
+  <ol class="breadcrumb">
+    <li class="breadcrumb-item"><a routerLink="/" class="link-body-emphasis link-underline-opacity-0 link-underline-opacity-100-hover">Home</a></li>
+    <li class="breadcrumb-item active" aria-current="page">Contact</li>
+  </ol>
+</nav>
+
+<div class="mb-4">
+  <h1 class="h2 fw-bold mb-1">Contact</h1>
+  <p class="text-body-secondary mb-0">Questions, feedback or a project idea? Write to me and I will reply as soon as I can.</p>
+</div>
+
+<div class="row g-4">
+
+  <!-- contact info -->
+  <div class="col-lg-5">
+    <div class="card border-0 shadow-sm mb-4">
+      <ul class="list-group list-group-flush">
+        <li class="list-group-item d-flex align-items-center gap-3 py-3">
+          <i class="bi bi-envelope fs-4 text-primary"></i>
+          <div>
+            <div class="small text-body-secondary">Email</div>
+            <a [href]="'mailto:' + site.contact.email" class="link-body-emphasis fw-semibold link-underline-opacity-0 link-underline-opacity-100-hover">{{ site.contact.email }}</a>
+          </div>
+        </li>
+        <li class="list-group-item d-flex align-items-center gap-3 py-3">
+          <i class="bi bi-telephone fs-4 text-primary"></i>
+          <div>
+            <div class="small text-body-secondary">Phone</div>
+            <span class="fw-semibold">{{ site.contact.phone }}</span>
+          </div>
+        </li>
+        <li class="list-group-item d-flex align-items-center gap-3 py-3">
+          <i class="bi bi-geo-alt fs-4 text-primary"></i>
+          <div>
+            <div class="small text-body-secondary">Location</div>
+            <span class="fw-semibold">{{ site.contact.location }}</span>
+          </div>
+        </li>
+        <li class="list-group-item d-flex align-items-center gap-3 py-3">
+          <i class="bi bi-clock fs-4 text-primary"></i>
+          <div>
+            <div class="small text-body-secondary">Working hours</div>
+            <span class="fw-semibold">{{ site.contact.hours }}</span>
+          </div>
+        </li>
+      </ul>
+    </div>
+
+    <div class="card border-0 shadow-sm">
+      <div class="card-body">
+        <h2 class="h6 fw-bold mb-3">Find me online</h2>
+        <div class="d-grid gap-2">
+          <a *ngFor="let s of site.socials" [href]="s.url" target="_blank" rel="noopener"
+            class="btn btn-outline-secondary text-start d-flex align-items-center">
+            <i class="bi me-3 fs-5" [ngClass]="s.icon"></i>
+            <span class="flex-grow-1">{{ s.name }}</span>
+            <i class="bi bi-box-arrow-up-right small"></i>
+          </a>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- form -->
+  <div class="col-lg-7">
+    <form class="card border-0 shadow-sm" #contactForm="ngForm" (ngSubmit)="onSubmit(contactForm)" novalidate>
+      <div class="card-body p-3 p-md-4">
+
+        <h2 class="h5 fw-bold mb-3">Send a message</h2>
+
+        <div class="alert alert-success d-flex align-items-start" role="alert" *ngIf="sent">
+          <i class="bi bi-check-circle-fill me-2"></i>
+          <div>Your email app should open now with the message ready. Just press send there.</div>
+        </div>
+
+        <div class="row g-3 mb-3">
+          <div class="col-md-6">
+            <label for="name" class="form-label fw-semibold">Your name</label>
+            <input id="name" name="name" type="text" class="form-control" placeholder="Your name"
+              [(ngModel)]="name" #nameInput="ngModel" required minlength="2"
+              [class.is-invalid]="nameInput.invalid && (nameInput.touched || contactForm.submitted)">
+            <div class="invalid-feedback">Please enter your name.</div>
+          </div>
+          <div class="col-md-6">
+            <label for="email" class="form-label fw-semibold">Email</label>
+            <input id="email" name="email" type="email" class="form-control" placeholder="you@example.com"
+              [(ngModel)]="email" #emailInput="ngModel" required email
+              [class.is-invalid]="emailInput.invalid && (emailInput.touched || contactForm.submitted)">
+            <div class="invalid-feedback">Please enter a valid email address.</div>
+          </div>
+        </div>
+
+        <div class="mb-3">
+          <label for="topic" class="form-label fw-semibold">Topic</label>
+          <select id="topic" name="topic" class="form-select"
+            [(ngModel)]="topic" #topicInput="ngModel" required
+            [class.is-invalid]="topicInput.invalid && (topicInput.touched || contactForm.submitted)">
+            <option value="" disabled>Choose a topic</option>
+            <option *ngFor="let t of topics" [value]="t">{{ t }}</option>
+          </select>
+          <div class="invalid-feedback">Please choose a topic.</div>
+        </div>
+
+        <div class="mb-4">
+          <label for="message" class="form-label fw-semibold">Message</label>
+          <textarea id="message" name="message" rows="6" class="form-control" placeholder="Write your message here"
+            [(ngModel)]="message" #messageInput="ngModel" required minlength="10"
+            [class.is-invalid]="messageInput.invalid && (messageInput.touched || contactForm.submitted)"></textarea>
+          <div class="invalid-feedback">Your message should be at least 10 characters.</div>
+        </div>
+
+        <button type="submit" class="btn btn-primary">
+          <i class="bi bi-send me-2"></i>Send message
+        </button>
+
+      </div>
+    </form>
+  </div>
+
+</div>

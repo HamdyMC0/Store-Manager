@@ -1,0 +1,90 @@
+<nav class="navbar navbar-expand-lg bg-dark sticky-top shadow" data-bs-theme="dark">
+  <div class="container">
+
+    <a routerLink="/" class="navbar-brand d-flex align-items-center fw-bold" (click)="closeMenu()">
+      <i class="bi bi-shop-window text-info fs-4 me-2"></i>
+      Store<span class="text-info ms-1">Manager</span>
+    </a>
+
+    <button class="navbar-toggler" type="button" (click)="toggleMenu()" aria-label="Toggle menu">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+
+    <div class="collapse navbar-collapse" [class.show]="menuOpen">
+
+      <ul class="navbar-nav me-auto mt-3 mt-lg-0 ms-lg-4">
+        <li class="nav-item">
+          <a class="nav-link" routerLink="/" routerLinkActive="active" [routerLinkActiveOptions]="{ exact: true }" (click)="closeMenu()">Home</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" routerLink="/products" routerLinkActive="active" [routerLinkActiveOptions]="{ exact: true }" (click)="closeMenu()">Products</a>
+        </li>
+        <li class="nav-item dropdown">
+          <a class="nav-link dropdown-toggle" href="#" role="button" id="categoriesDropdown"
+            [attr.aria-expanded]="openDropdown === 'categories'" (click)="toggleDropdown($event, 'categories')">Categories</a>
+          <ul class="dropdown-menu shadow border-0" [class.show]="openDropdown === 'categories'" aria-labelledby="categoriesDropdown">
+            <li *ngFor="let c of categories">
+              <a class="dropdown-item" routerLink="/products" [queryParams]="{ category: c.slug }" (click)="closeMenu()">
+                <i class="bi bi-tag me-2"></i>{{ c.name }}
+              </a>
+            </li>
+            <li *ngIf="categories.length === 0"><span class="dropdown-item-text text-body-secondary">No categories yet</span></li>
+            <li><hr class="dropdown-divider"></li>
+            <li>
+              <a class="dropdown-item" routerLink="/products" (click)="closeMenu()">
+                <i class="bi bi-grid me-2"></i>All products
+              </a>
+            </li>
+          </ul>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" routerLink="/contact" routerLinkActive="active" (click)="closeMenu()">Contact</a>
+        </li>
+      </ul>
+
+      <div class="d-flex align-items-center gap-2 mt-3 mt-lg-0">
+
+        <button type="button" class="btn btn-outline-secondary btn-sm"
+          (click)="themeService.toggle()" [attr.aria-label]="'Switch to ' + (themeService.theme === 'dark' ? 'light' : 'dark') + ' mode'">
+          <i class="bi" [ngClass]="themeService.theme === 'dark' ? 'bi-sun-fill' : 'bi-moon-stars-fill'"></i>
+        </button>
+
+        <!-- not logged in -->
+        <ng-container *ngIf="!authService.isLoggedIn">
+          <a routerLink="/login" class="btn btn-outline-light btn-sm" (click)="closeMenu()">Log in</a>
+          <a routerLink="/register" class="btn btn-primary btn-sm" (click)="closeMenu()">Sign up</a>
+        </ng-container>
+
+        <!-- logged in -->
+        <div class="dropdown" *ngIf="authService.currentUser as user">
+          <a href="#" class="d-flex align-items-center text-decoration-none text-white dropdown-toggle" id="userDropdown"
+            role="button" [attr.aria-expanded]="openDropdown === 'user'" (click)="toggleDropdown($event, 'user')">
+            <img *ngIf="user.image" [src]="user.image" alt="Profile picture" width="32" height="32"
+              class="rounded-circle object-fit-cover border border-2 border-primary me-2">
+            <i *ngIf="!user.image" class="bi bi-person-circle fs-4 me-2" [title]="user.name"></i>
+            <span class="d-none d-xl-inline">{{ user.name }}</span>
+          </a>
+          <ul class="dropdown-menu dropdown-menu-end shadow border-0" [class.show]="openDropdown === 'user'" aria-labelledby="userDropdown">
+            <li>
+              <span class="dropdown-item-text">
+                <span class="d-block fw-semibold">{{ user.name }}</span>
+                <span class="badge" [ngClass]="authService.isAdmin ? 'text-bg-primary' : 'text-bg-secondary'">{{ user.role | titlecase }}</span>
+              </span>
+            </li>
+            <li><hr class="dropdown-divider"></li>
+            <li><a class="dropdown-item" routerLink="/profile" (click)="closeMenu()"><i class="bi bi-person-circle me-2"></i>My profile</a></li>
+            <ng-container *ngIf="authService.isAdmin">
+              <li><a class="dropdown-item" routerLink="/add-product" (click)="closeMenu()"><i class="bi bi-plus-circle me-2"></i>Add product</a></li>
+              <li><a class="dropdown-item" routerLink="/admin/categories" (click)="closeMenu()"><i class="bi bi-diagram-3 me-2"></i>Manage categories</a></li>
+            </ng-container>
+            <li><hr class="dropdown-divider"></li>
+            <li><button type="button" class="dropdown-item text-danger-emphasis" (click)="logout()"><i class="bi bi-box-arrow-right me-2"></i>Log out</button></li>
+          </ul>
+        </div>
+
+      </div>
+
+    </div>
+
+  </div>
+</nav>

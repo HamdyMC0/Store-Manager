@@ -1,0 +1,146 @@
+<!-- after the account is created -->
+<div class="row justify-content-center" *ngIf="registeredEmail">
+  <div class="col-md-8 col-lg-6">
+    <div class="card border-0 shadow text-center">
+      <div class="card-body p-4 p-md-5">
+        <div class="d-inline-flex align-items-center justify-content-center rounded-circle bg-success-subtle text-success-emphasis mb-3">
+          <i class="bi bi-envelope-check fs-1 p-3"></i>
+        </div>
+        <h1 class="h3 fw-bold">Check your email</h1>
+        <p class="text-body-secondary mb-1">Your account was created. We sent an activation link to</p>
+        <p class="fw-semibold mb-3">{{ registeredEmail }}</p>
+        <p class="text-body-secondary small mb-4">
+          Open the email and click the link to activate your account, then come back and log in.
+          If you cannot find it, look in the spam folder.
+        </p>
+        <a routerLink="/login" class="btn btn-primary px-4">Go to login</a>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- the form -->
+<div class="row justify-content-center" *ngIf="!registeredEmail">
+  <div class="col-xl-10">
+    <div class="card border-0 shadow overflow-hidden">
+      <div class="row g-0">
+
+        <!-- side panel -->
+        <div class="col-lg-5 d-none d-lg-flex flex-column justify-content-between bg-primary bg-gradient text-white p-5">
+          <div>
+            <div class="d-flex align-items-center mb-5">
+              <i class="bi bi-shop-window fs-3 me-2"></i>
+              <span class="fw-semibold fs-5">Store Manager</span>
+            </div>
+            <h2 class="h2 mb-3">Create your account</h2>
+            <p class="opacity-75">It takes less than a minute. We will send you an email to confirm your address.</p>
+          </div>
+          <ul class="list-unstyled mb-0">
+            <li class="d-flex align-items-start mb-3"><i class="bi bi-1-circle me-2"></i><span class="opacity-75">Fill in the form</span></li>
+            <li class="d-flex align-items-start mb-3"><i class="bi bi-2-circle me-2"></i><span class="opacity-75">Click the link we send to your email</span></li>
+            <li class="d-flex align-items-start"><i class="bi bi-3-circle me-2"></i><span class="opacity-75">Log in and start using the store</span></li>
+          </ul>
+        </div>
+
+        <!-- form -->
+        <div class="col-lg-7">
+          <div class="card-body p-4 p-md-5">
+            <h1 class="h3 fw-bold mb-1">Sign up</h1>
+            <p class="text-body-secondary mb-4">Create an account to get started.</p>
+
+            <div class="alert alert-danger d-flex align-items-start" role="alert" *ngIf="errorMessage">
+              <i class="bi bi-exclamation-triangle-fill me-2"></i>
+              <div>{{ errorMessage }}</div>
+            </div>
+
+            <form #registerForm="ngForm" (ngSubmit)="onSubmit()" novalidate>
+
+              <div class="mb-3">
+                <label for="name" class="form-label fw-semibold">Full name</label>
+                <div class="input-group has-validation">
+                  <span class="input-group-text"><i class="bi bi-person"></i></span>
+                  <input id="name" name="name" type="text" class="form-control" placeholder="Your full name"
+                    autocomplete="name" [(ngModel)]="name" #nameInput="ngModel" required minlength="3" maxlength="30"
+                    [class.is-invalid]="nameInput.invalid && (nameInput.touched || registerForm.submitted)">
+                  <div class="invalid-feedback">Name must be between 3 and 30 characters.</div>
+                </div>
+              </div>
+
+              <div class="mb-3">
+                <label for="email" class="form-label fw-semibold">Email</label>
+                <div class="input-group has-validation">
+                  <span class="input-group-text"><i class="bi bi-envelope"></i></span>
+                  <input id="email" name="email" type="email" class="form-control" placeholder="you@example.com"
+                    autocomplete="email" [(ngModel)]="email" #emailInput="ngModel" required email
+                    [class.is-invalid]="emailInput.invalid && (emailInput.touched || registerForm.submitted)">
+                  <div class="invalid-feedback">Please enter a valid email address.</div>
+                </div>
+              </div>
+
+              <div class="row g-3 mb-3">
+                <div class="col-md-7">
+                  <label for="phone" class="form-label fw-semibold">Phone <span class="text-body-secondary fw-normal">(optional)</span></label>
+                  <div class="input-group has-validation">
+                    <span class="input-group-text"><i class="bi bi-telephone"></i></span>
+                    <input id="phone" name="phone" type="tel" class="form-control" placeholder="01XXXXXXXXX"
+                      autocomplete="tel" [(ngModel)]="phone" #phoneInput="ngModel" pattern="^[0-9+ ]{8,15}$"
+                      [class.is-invalid]="phoneInput.invalid && phoneInput.touched">
+                    <div class="invalid-feedback">Enter a valid phone number (8 to 15 digits).</div>
+                  </div>
+                </div>
+                <div class="col-md-5">
+                  <label for="gender" class="form-label fw-semibold">Gender <span class="text-body-secondary fw-normal">(optional)</span></label>
+                  <select id="gender" name="gender" class="form-select" [(ngModel)]="gender">
+                    <option value="">Prefer not to say</option>
+                    <option value="male">Male</option>
+                    <option value="female">Female</option>
+                  </select>
+                </div>
+              </div>
+
+              <div class="mb-3">
+                <label for="password" class="form-label fw-semibold">Password</label>
+                <div class="input-group has-validation">
+                  <span class="input-group-text"><i class="bi bi-lock"></i></span>
+                  <input id="password" name="password" class="form-control" placeholder="At least 8 characters"
+                    autocomplete="new-password" [type]="showPassword ? 'text' : 'password'"
+                    [(ngModel)]="password" #passwordInput="ngModel" required minlength="8"
+                    [class.is-invalid]="passwordInput.invalid && (passwordInput.touched || registerForm.submitted)">
+                  <button type="button" class="btn btn-outline-secondary" (click)="showPassword = !showPassword"
+                    [attr.aria-label]="showPassword ? 'Hide password' : 'Show password'">
+                    <i class="bi" [ngClass]="showPassword ? 'bi-eye-slash' : 'bi-eye'"></i>
+                  </button>
+                  <div class="invalid-feedback">Password must be at least 8 characters.</div>
+                </div>
+              </div>
+
+              <div class="mb-4">
+                <label for="confirmPassword" class="form-label fw-semibold">Confirm password</label>
+                <div class="input-group has-validation">
+                  <span class="input-group-text"><i class="bi bi-shield-lock"></i></span>
+                  <input id="confirmPassword" name="confirmPassword" class="form-control" placeholder="Write the password again"
+                    autocomplete="new-password" [type]="showPassword ? 'text' : 'password'"
+                    [(ngModel)]="confirmPassword" #confirmInput="ngModel" required
+                    [class.is-invalid]="(confirmInput.touched || registerForm.submitted) && (confirmInput.invalid || !passwordsMatch)">
+                  <div class="invalid-feedback">The two passwords are not the same.</div>
+                </div>
+              </div>
+
+              <button type="submit" class="btn btn-primary w-100 py-2" [disabled]="registerForm.invalid || !passwordsMatch || saving">
+                <span class="spinner-border spinner-border-sm me-2" *ngIf="saving" aria-hidden="true"></span>
+                {{ saving ? 'Creating account...' : 'Create account' }}
+              </button>
+
+            </form>
+
+            <p class="text-center text-body-secondary mt-4 mb-0">
+              Already have an account?
+              <a routerLink="/login" class="fw-semibold">Log in</a>
+            </p>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+</div>

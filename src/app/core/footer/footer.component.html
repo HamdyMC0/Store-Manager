@@ -1,0 +1,67 @@
+<footer class="bg-dark text-white-50 pt-5 mt-5" data-bs-theme="dark">
+  <div class="container">
+
+    <div class="row g-4 pb-4">
+
+      <div class="col-lg-4">
+        <h2 class="h5 text-white d-flex align-items-center">
+          <i class="bi bi-shop-window text-info me-2"></i>{{ site.name }}
+        </h2>
+        <p class="small mb-3">
+          A simple way to browse, add and manage the products of a small store.
+          Built with Angular, Bootstrap and Node.js.
+        </p>
+        <div class="d-flex flex-wrap gap-2">
+          <a *ngFor="let s of site.socials" [href]="s.url" target="_blank" rel="noopener"
+            class="btn btn-outline-light btn-sm" [title]="s.name" [attr.aria-label]="s.name">
+            <i class="bi" [ngClass]="s.icon"></i>
+          </a>
+        </div>
+      </div>
+
+      <div class="col-6 col-lg-2 offset-lg-1">
+        <h3 class="h6 text-white mb-3">Explore</h3>
+        <ul class="list-unstyled small mb-0">
+          <li class="mb-2"><a routerLink="/" class="link-light link-opacity-75 link-opacity-100-hover text-decoration-none">Home</a></li>
+          <li class="mb-2"><a routerLink="/products" class="link-light link-opacity-75 link-opacity-100-hover text-decoration-none">Products</a></li>
+          <li class="mb-2"><a routerLink="/contact" class="link-light link-opacity-75 link-opacity-100-hover text-decoration-none">Contact</a></li>
+          <ng-container *ngIf="!authService.isLoggedIn">
+            <li class="mb-2"><a routerLink="/login" class="link-light link-opacity-75 link-opacity-100-hover text-decoration-none">Log in</a></li>
+            <li class="mb-2"><a routerLink="/register" class="link-light link-opacity-75 link-opacity-100-hover text-decoration-none">Sign up</a></li>
+          </ng-container>
+          <li class="mb-2" *ngIf="authService.isLoggedIn"><a routerLink="/profile" class="link-light link-opacity-75 link-opacity-100-hover text-decoration-none">My profile</a></li>
+        </ul>
+      </div>
+
+      <div class="col-6 col-lg-2">
+        <h3 class="h6 text-white mb-3">Categories</h3>
+        <ul class="list-unstyled small mb-0">
+          <li class="mb-2" *ngFor="let c of categories">
+            <a routerLink="/products" [queryParams]="{ category: c.slug }"
+              class="link-light link-opacity-75 link-opacity-100-hover text-decoration-none">{{ c.name }}</a>
+          </li>
+          <li class="mb-2" *ngIf="categories.length === 0">No categories yet</li>
+        </ul>
+      </div>
+
+      <div class="col-lg-3">
+        <h3 class="h6 text-white mb-3">Get in touch</h3>
+        <ul class="list-unstyled small mb-0">
+          <li class="mb-2"><i class="bi bi-envelope me-2 text-info"></i>{{ site.contact.email }}</li>
+          <li class="mb-2"><i class="bi bi-telephone me-2 text-info"></i>{{ site.contact.phone }}</li>
+          <li class="mb-2"><i class="bi bi-geo-alt me-2 text-info"></i>{{ site.contact.location }}</li>
+        </ul>
+      </div>
+
+    </div>
+
+    <div class="border-top border-secondary-subtle py-3 d-flex flex-column flex-md-row justify-content-between align-items-center gap-2 small">
+      <span>&copy; {{ site.year }} {{ site.name }}. All rights reserved.</span>
+      <span>
+        Designed and developed by
+        <a routerLink="/" fragment="about" class="link-info link-underline-opacity-0 link-underline-opacity-100-hover fw-semibold">{{ site.author.name }}</a>
+      </span>
+    </div>
+
+  </div>
+</footer>

@@ -1,0 +1,22 @@
+<div class="modal fade show d-block" tabindex="-1" role="dialog" aria-modal="true" aria-labelledby="confirmTitle" (click)="cancel.emit()">
+  <div class="modal-dialog modal-dialog-centered" (click)="$event.stopPropagation()">
+    <div class="modal-content border-0 shadow-lg">
+      <div class="modal-header border-0 pb-0">
+        <h2 class="modal-title h5" id="confirmTitle">{{ title }}</h2>
+        <button type="button" class="btn-close" aria-label="Close" (click)="cancel.emit()"></button>
+      </div>
+      <div class="modal-body">
+        <p class="mb-2 text-body-secondary" *ngIf="message">{{ message }}</p>
+        <p class="fw-semibold mb-0" *ngIf="detail">{{ detail | truncate:70 }}</p>
+      </div>
+      <div class="modal-footer border-0 pt-0">
+        <button type="button" class="btn btn-outline-secondary" (click)="cancel.emit()">Cancel</button>
+        <button type="button" class="btn btn-danger" [disabled]="busy" (click)="confirm.emit()">
+          <span class="spinner-border spinner-border-sm me-1" *ngIf="busy" aria-hidden="true"></span>
+          <i class="bi bi-trash me-1" *ngIf="!busy"></i>{{ confirmText }}
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+<div class="modal-backdrop fade show"></div>

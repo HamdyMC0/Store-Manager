@@ -1,0 +1,18 @@
+<div class="d-flex flex-column min-vh-100">
+
+  <app-navbar></app-navbar>
+
+  <main class="container py-4 py-md-5 flex-grow-1">
+    <router-outlet></router-outlet>
+  </main>
+
+  <app-footer></app-footer>
+
+</div>
+
+<app-toasts></app-toasts>
+
+<button type="button" class="btn btn-primary shadow position-fixed bottom-0 end-0 m-4"
+  *ngIf="showTopButton" (click)="scrollToTop()" aria-label="Back to top">
+  <i class="bi bi-arrow-up"></i>
+</button>

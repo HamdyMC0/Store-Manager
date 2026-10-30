@@ -1,0 +1,28 @@
+<div class="row justify-content-center">
+  <div class="col-md-8 col-lg-5">
+
+    <app-loading-spinner *ngIf="loading" message="Activating your account..."></app-loading-spinner>
+
+    <div class="card border-0 shadow text-center" *ngIf="!loading && success">
+      <div class="card-body p-4 p-md-5">
+        <i class="bi bi-patch-check-fill display-3 text-success-emphasis"></i>
+        <h1 class="h3 fw-bold mt-2">Account activated</h1>
+        <p class="text-body-secondary mb-4">Your email is confirmed. You can log in now.</p>
+        <a routerLink="/login" class="btn btn-primary px-4">Log in</a>
+      </div>
+    </div>
+
+    <div class="card border-0 shadow text-center" *ngIf="!loading && !success">
+      <div class="card-body p-4 p-md-5">
+        <i class="bi bi-x-octagon-fill display-3 text-danger-emphasis"></i>
+        <h1 class="h3 fw-bold mt-2">Activation failed</h1>
+        <p class="text-body-secondary mb-4">{{ errorMessage }} The link may be wrong or already used.</p>
+        <div class="d-flex justify-content-center gap-2">
+          <a routerLink="/login" class="btn btn-primary">Go to login</a>
+          <a routerLink="/register" class="btn btn-outline-secondary">Sign up again</a>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>

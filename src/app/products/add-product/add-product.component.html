@@ -1,0 +1,128 @@
+<nav aria-label="breadcrumb">
+  <ol class="breadcrumb">
+    <li class="breadcrumb-item"><a routerLink="/" class="link-body-emphasis link-underline-opacity-0 link-underline-opacity-100-hover">Home</a></li>
+    <li class="breadcrumb-item"><a routerLink="/products" class="link-body-emphasis link-underline-opacity-0 link-underline-opacity-100-hover">Products</a></li>
+    <li class="breadcrumb-item active" aria-current="page">{{ editId ? 'Edit Product' : 'Add Product' }}</li>
+  </ol>
+</nav>
+
+<div class="mb-4">
+  <h1 class="h2 fw-bold mb-1">{{ editId ? 'Edit Product' : 'Add Product' }}</h1>
+  <p class="text-body-secondary mb-0">Fill in the details below. The card on the right shows how the product will look.</p>
+</div>
+
+<app-loading-spinner *ngIf="loadingProduct" message="Loading product..."></app-loading-spinner>
+
+<div class="card border-0 shadow-sm text-center" *ngIf="notFound">
+  <div class="card-body py-5">
+    <i class="bi bi-emoji-frown fs-1 text-body-secondary"></i>
+    <h2 class="h4 mt-2">Product not found</h2>
+    <p class="text-body-secondary mb-4">This product does not exist, or it was deleted.</p>
+    <a routerLink="/products" class="btn btn-primary">Back to Products</a>
+  </div>
+</div>
+
+<div class="row g-4" *ngIf="!loadingProduct && !notFound">
+  <div class="col-lg-8">
+
+    <form class="card border-0 shadow-sm" #productForm="ngForm" (ngSubmit)="onSubmit()"
+      (input)="updatePreview()" novalidate>
+      <div class="card-body p-3 p-md-4">
+
+        <div class="alert alert-danger" role="alert" *ngIf="errorMessage">{{ errorMessage }}</div>
+
+        <div class="mb-3">
+          <label for="title" class="form-label fw-semibold">Title</label>
+          <input id="title" name="title" type="text" class="form-control" placeholder="e.g. Wireless Headphones"
+            [(ngModel)]="title" #titleInput="ngModel" required minlength="3"
+            [class.is-invalid]="titleInput.invalid && (titleInput.touched || productForm.submitted)">
+          <div class="invalid-feedback">Title is required (at least 3 characters).</div>
+        </div>
+
+        <div class="row g-3 mb-3">
+          <div class="col-md-6">
+            <label for="price" class="form-label fw-semibold">Price</label>
+            <div class="input-group has-validation">
+              <span class="input-group-text">$</span>
+              <input id="price" name="price" type="number" step="0.01" class="form-control" placeholder="0.00"
+                [(ngModel)]="price" #priceInput="ngModel" required
+                [class.is-invalid]="(priceInput.touched || productForm.submitted) && !priceIsValid">
+              <div class="invalid-feedback">Price must be greater than zero.</div>
+            </div>
+          </div>
+
+          <div class="col-md-6">
+            <label for="stock" class="form-label fw-semibold">Stock quantity</label>
+            <div class="input-group has-validation">
+              <span class="input-group-text"><i class="bi bi-box-seam"></i></span>
+              <input id="stock" name="stock" type="number" min="0" step="1" class="form-control"
+                [(ngModel)]="stock" #stockInput="ngModel" required
+                [class.is-invalid]="(stockInput.touched || productForm.submitted) && !stockIsValid">
+              <div class="invalid-feedback">Stock must be a whole number, 0 or more.</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="row g-3 mb-3">
+          <div class="col-md-6">
+            <label for="category" class="form-label fw-semibold">Category</label>
+            <select id="category" name="category" class="form-select"
+              [(ngModel)]="categoryId" (ngModelChange)="onCategoryChange()" #categoryInput="ngModel" required
+              [class.is-invalid]="categoryInput.invalid && (categoryInput.touched || productForm.submitted)">
+              <option value="" disabled>Select a category</option>
+              <option *ngFor="let c of categories" [value]="c.id">{{ c.name }}</option>
+            </select>
+            <div class="invalid-feedback">Please choose a category.</div>
+            <div class="form-text" *ngIf="categories.length === 0">
+              There are no categories yet.
+              <a routerLink="/admin/categories">Create one first</a>.
+            </div>
+          </div>
+
+          <div class="col-md-6">
+            <label for="subcategory" class="form-label fw-semibold">Subcategory <span class="text-body-secondary fw-normal">(optional)</span></label>
+            <select id="subcategory" name="subcategory" class="form-select"
+              [(ngModel)]="subcategoryId" (ngModelChange)="updatePreview()" [disabled]="availableSubcategories.length === 0">
+              <option value="">{{ availableSubcategories.length === 0 ? 'No subcategories' : 'None' }}</option>
+              <option *ngFor="let s of availableSubcategories" [value]="s.id">{{ s.name }}</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="mb-3">
+          <label for="image" class="form-label fw-semibold">
+            Picture <span class="text-body-secondary fw-normal" *ngIf="editId">(leave it empty to keep the current one)</span>
+          </label>
+          <input id="image" name="image" type="file" accept="image/*" class="form-control"
+            [class.is-invalid]="imageError" (change)="onFileChange($event)">
+          <div class="invalid-feedback">{{ imageError }}</div>
+          <div class="form-text">PNG, JPG or WEBP. Maximum size 5 MB.</div>
+        </div>
+
+        <div class="mb-4">
+          <label for="description" class="form-label fw-semibold">Description</label>
+          <textarea id="description" name="description" rows="5" class="form-control"
+            placeholder="Write a short description of the product"
+            [(ngModel)]="description" #descriptionInput="ngModel" required minlength="10"
+            [class.is-invalid]="descriptionInput.invalid && (descriptionInput.touched || productForm.submitted)"></textarea>
+          <div class="invalid-feedback">Description is required (at least 10 characters).</div>
+        </div>
+
+        <div class="d-flex justify-content-end gap-2">
+          <a routerLink="/products" class="btn btn-outline-secondary">Cancel</a>
+          <button type="submit" class="btn btn-primary" [disabled]="productForm.invalid || !priceIsValid || !stockIsValid || saving">
+            <span class="spinner-border spinner-border-sm me-2" *ngIf="saving" aria-hidden="true"></span>
+            {{ saving ? 'Saving...' : (editId ? 'Save Changes' : 'Save Product') }}
+          </button>
+        </div>
+
+      </div>
+    </form>
+
+  </div>
+
+  <div class="col-lg-4">
+    <p class="small fw-semibold text-body-secondary text-uppercase mb-2">Live preview</p>
+    <app-product-card class="d-block" [product]="previewProduct" [preview]="true"></app-product-card>
+  </div>
+</div>

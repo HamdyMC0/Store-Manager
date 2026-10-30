@@ -1,0 +1,211 @@
+<!-- hero -->
+<section class="bg-dark bg-gradient text-white rounded-4 shadow-lg p-4 p-md-5" data-bs-theme="dark">
+  <div class="row align-items-center g-5">
+
+    <div class="col-lg-7">
+      <span class="badge rounded-pill text-bg-info mb-3">
+        <i class="bi bi-box-seam me-1"></i>Inventory made simple
+      </span>
+      <h1 class="display-5 fw-bold mb-3">Manage your store's products in one place</h1>
+      <p class="lead text-white-50 mb-4">
+        Browse the catalog, see what is running low, add new items and remove the old ones.
+        Everything is on one screen, and it works on your phone too.
+      </p>
+      <div class="d-flex flex-wrap gap-2 mb-4">
+        <a routerLink="/products" class="btn btn-primary btn-lg">
+          <i class="bi bi-grid me-2"></i>Browse products
+        </a>
+        <a routerLink="/register" class="btn btn-outline-light btn-lg" *ngIf="!authService.isLoggedIn">
+          <i class="bi bi-person-plus me-2"></i>Create an account
+        </a>
+        <a routerLink="/add-product" class="btn btn-outline-light btn-lg" *ngIf="authService.isAdmin">
+          <i class="bi bi-plus-lg me-2"></i>Add a product
+        </a>
+        <a routerLink="/profile" class="btn btn-outline-light btn-lg" *ngIf="authService.isLoggedIn && !authService.isAdmin">
+          <i class="bi bi-person-circle me-2"></i>My profile
+        </a>
+      </div>
+      <p class="small text-white-50 mb-0">
+        Designed and built by
+        <a routerLink="/" fragment="about" class="link-info fw-semibold link-underline-opacity-0 link-underline-opacity-100-hover">{{ site.author.name }}</a>
+      </p>
+    </div>
+
+    <div class="col-lg-5">
+      <div class="card border-secondary-subtle bg-body-secondary bg-opacity-10">
+        <div class="card-header border-secondary-subtle d-flex justify-content-between align-items-center">
+          <span class="fw-semibold">Store snapshot</span>
+          <span class="badge text-bg-success" *ngIf="!loading && !failed">Live data</span>
+        </div>
+
+        <ul class="list-group list-group-flush" *ngIf="loading">
+          <li class="list-group-item bg-transparent py-3 placeholder-glow" *ngFor="let i of [1, 2, 3, 4]">
+            <span class="placeholder col-8"></span>
+          </li>
+        </ul>
+
+        <ul class="list-group list-group-flush" *ngIf="!loading && !failed">
+          <li class="list-group-item bg-transparent d-flex justify-content-between align-items-center py-3">
+            <span><i class="bi bi-box-seam text-info me-2"></i>Products</span>
+            <span class="fw-bold fs-5">{{ products.length }}</span>
+          </li>
+          <li class="list-group-item bg-transparent d-flex justify-content-between align-items-center py-3">
+            <span><i class="bi bi-check-circle text-success-emphasis me-2"></i>In stock</span>
+            <span class="fw-bold fs-5">{{ inStock }}</span>
+          </li>
+          <li class="list-group-item bg-transparent d-flex justify-content-between align-items-center py-3">
+            <span><i class="bi bi-x-circle text-danger-emphasis me-2"></i>Out of stock</span>
+            <span class="fw-bold fs-5">{{ outOfStock }}</span>
+          </li>
+          <li class="list-group-item bg-transparent d-flex justify-content-between align-items-center py-3">
+            <span><i class="bi bi-tag text-warning me-2"></i>Average price</span>
+            <span class="fw-bold fs-5">{{ averagePrice | currency }}</span>
+          </li>
+        </ul>
+
+        <div class="card-body text-center text-white-50 small" *ngIf="!loading && failed">
+          The numbers could not be loaded. Please check that the backend is running.
+        </div>
+      </div>
+    </div>
+
+  </div>
+</section>
+
+<!-- latest products -->
+<section class="mt-5" *ngIf="loading || latest.length > 0">
+  <div class="d-flex justify-content-between align-items-end mb-3">
+    <div>
+      <h2 class="h3 fw-bold mb-1">Latest products</h2>
+      <p class="text-body-secondary mb-0">The newest items added to your store.</p>
+    </div>
+    <a routerLink="/products" class="btn btn-outline-primary btn-sm">View all<i class="bi bi-arrow-right ms-1"></i></a>
+  </div>
+
+  <div class="row row-cols-1 row-cols-sm-2 row-cols-lg-4 g-4" *ngIf="loading">
+    <div class="col" *ngFor="let i of [1, 2, 3, 4]">
+      <div class="card h-100 border-0 shadow-sm" aria-hidden="true">
+        <div class="ratio ratio-4x3 placeholder-glow"><span class="placeholder"></span></div>
+        <div class="card-body placeholder-glow">
+          <span class="placeholder col-4 mb-3"></span>
+          <span class="placeholder col-10 mb-2"></span>
+          <span class="placeholder col-7"></span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="row row-cols-1 row-cols-sm-2 row-cols-lg-4 g-4" *ngIf="!loading">
+    <div class="col" *ngFor="let product of latest">
+      <app-product-card class="d-block h-100" [product]="product" [canManage]="false"></app-product-card>
+    </div>
+  </div>
+</section>
+
+<!-- empty store -->
+<section class="mt-5" *ngIf="!loading && !failed && products.length === 0">
+  <div class="card border-0 shadow-sm text-center">
+    <div class="card-body py-5">
+      <i class="bi bi-inboxes fs-1 text-body-secondary"></i>
+      <h2 class="h4 mt-2">The store is empty</h2>
+      <p class="text-body-secondary mb-0" *ngIf="!authService.isAdmin">No products have been added yet. Please come back soon.</p>
+      <ng-container *ngIf="authService.isAdmin">
+        <p class="text-body-secondary mb-4">Add your first product to see it here.</p>
+        <a routerLink="/add-product" class="btn btn-primary">Add a product</a>
+      </ng-container>
+    </div>
+  </div>
+</section>
+
+<!-- categories -->
+<section class="mt-5" *ngIf="categories.length > 0">
+  <h2 class="h3 fw-bold mb-1">Shop by category</h2>
+  <p class="text-body-secondary mb-3">Jump straight to the products of one category.</p>
+
+  <div class="row row-cols-2 row-cols-lg-4 g-3">
+    <div class="col" *ngFor="let c of categories">
+      <div class="card h-100 border-0 shadow-sm overflow-hidden">
+        <div class="ratio ratio-16x9 bg-body-secondary">
+          <img *ngIf="c.image" [src]="c.image" [alt]="c.name" class="object-fit-cover">
+          <div *ngIf="!c.image" class="d-flex align-items-center justify-content-center text-body-secondary">
+            <i class="bi bi-tag fs-1"></i>
+          </div>
+        </div>
+        <div class="card-body text-center">
+          <h3 class="h6 mb-1">
+            <a routerLink="/products" [queryParams]="{ category: c.slug }"
+              class="stretched-link link-body-emphasis link-underline-opacity-0">{{ c.name }}</a>
+          </h3>
+          <p class="small text-body-secondary mb-0">
+            <span *ngIf="!loading && !failed">{{ countInCategory(c.id) }} products</span>
+            <span *ngIf="loading || failed">&nbsp;</span>
+          </p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- about the developer -->
+<section class="mt-5" id="about">
+  <div class="card border-0 shadow-sm overflow-hidden">
+    <div class="row g-0">
+
+      <div class="col-md-8">
+        <div class="card-body p-4 p-lg-5">
+          <p class="text-primary-emphasis fw-semibold small text-uppercase mb-1">About the developer</p>
+          <h2 class="h3 fw-bold mb-3">Hi, I'm {{ site.author.name }}</h2>
+          <p class="text-body-secondary">{{ site.author.bio }}</p>
+
+          <p class="fw-semibold mb-2">Tools I work with</p>
+          <div class="d-flex flex-wrap gap-2 mb-4">
+            <span class="badge rounded-pill bg-body-secondary text-body-secondary border" *ngFor="let skill of site.author.skills">{{ skill }}</span>
+          </div>
+
+          <a routerLink="/contact" class="btn btn-primary me-2">
+            <i class="bi bi-envelope me-2"></i>Contact me
+          </a>
+          <a [href]="site.socials[0].url" target="_blank" rel="noopener" class="btn btn-outline-secondary">
+            <i class="bi bi-github me-2"></i>See my work
+          </a>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<!-- faq -->
+<section class="mt-5">
+  <div class="row justify-content-center">
+    <div class="col-lg-8">
+      <h2 class="h3 fw-bold text-center mb-1">Common questions</h2>
+      <p class="text-body-secondary text-center mb-4">A few things people ask about this project.</p>
+
+      <div class="accordion shadow-sm">
+        <div class="accordion-item" *ngFor="let faq of faqs; let i = index">
+          <h3 class="accordion-header">
+            <button class="accordion-button" type="button" [class.collapsed]="openFaq !== i"
+              [attr.aria-expanded]="openFaq === i" (click)="toggleFaq(i)">
+              {{ faq.question }}
+            </button>
+          </h3>
+          <div class="accordion-collapse collapse" [class.show]="openFaq === i">
+            <div class="accordion-body text-body-secondary">{{ faq.answer }}</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- contact strip -->
+<section class="mt-5">
+  <div class="bg-primary-subtle rounded-4 p-4 p-md-5 text-center">
+    <h2 class="h3 fw-bold text-primary-emphasis">Have a question or an idea?</h2>
+    <p class="text-primary-emphasis mb-4">Send me a message and I will get back to you.</p>
+    <a routerLink="/contact" class="btn btn-primary btn-lg">
+      <i class="bi bi-chat-dots me-2"></i>Get in touch
+    </a>
+  </div>
+</section>

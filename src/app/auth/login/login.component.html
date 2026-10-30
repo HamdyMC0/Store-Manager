@@ -1,0 +1,81 @@
+<div class="row justify-content-center">
+  <div class="col-xl-10">
+    <div class="card border-0 shadow overflow-hidden">
+      <div class="row g-0">
+
+        <!-- side panel -->
+        <div class="col-lg-5 d-none d-lg-flex flex-column justify-content-between bg-primary bg-gradient text-white p-5">
+          <div>
+            <div class="d-flex align-items-center mb-5">
+              <i class="bi bi-shop-window fs-3 me-2"></i>
+              <span class="fw-semibold fs-5">Store Manager</span>
+            </div>
+            <h2 class="h2 mb-3">Welcome back</h2>
+            <p class="opacity-75">Log in to manage your products, check what is in stock and keep your catalog up to date.</p>
+          </div>
+          <ul class="list-unstyled mb-0">
+            <li class="d-flex align-items-start mb-3"><i class="bi bi-check2-circle me-2"></i><span class="opacity-75">See every product with its price and stock</span></li>
+            <li class="d-flex align-items-start mb-3"><i class="bi bi-check2-circle me-2"></i><span class="opacity-75">Admins can add, edit and delete products</span></li>
+            <li class="d-flex align-items-start"><i class="bi bi-check2-circle me-2"></i><span class="opacity-75">Your profile and photo in one place</span></li>
+          </ul>
+        </div>
+
+        <!-- form -->
+        <div class="col-lg-7">
+          <div class="card-body p-4 p-md-5">
+            <h1 class="h3 fw-bold mb-1">Log in</h1>
+            <p class="text-body-secondary mb-4">Enter your email and password to continue.</p>
+
+            <div class="alert d-flex align-items-start" role="alert" *ngIf="errorMessage"
+              [ngClass]="needsActivation ? 'alert-warning' : 'alert-danger'">
+              <i class="bi me-2" [ngClass]="needsActivation ? 'bi-envelope-exclamation' : 'bi-exclamation-triangle-fill'"></i>
+              <div>{{ errorMessage }}</div>
+            </div>
+
+            <form #loginForm="ngForm" (ngSubmit)="onSubmit()" novalidate>
+
+              <div class="mb-3">
+                <label for="email" class="form-label fw-semibold">Email</label>
+                <div class="input-group has-validation">
+                  <span class="input-group-text"><i class="bi bi-envelope"></i></span>
+                  <input id="email" name="email" type="email" class="form-control" placeholder="you@example.com"
+                    autocomplete="email" [(ngModel)]="email" #emailInput="ngModel" required email
+                    [class.is-invalid]="emailInput.invalid && (emailInput.touched || loginForm.submitted)">
+                  <div class="invalid-feedback">Please enter a valid email address.</div>
+                </div>
+              </div>
+
+              <div class="mb-4">
+                <label for="password" class="form-label fw-semibold">Password</label>
+                <div class="input-group has-validation">
+                  <span class="input-group-text"><i class="bi bi-lock"></i></span>
+                  <input id="password" name="password" class="form-control" placeholder="Your password"
+                    autocomplete="current-password" [type]="showPassword ? 'text' : 'password'"
+                    [(ngModel)]="password" #passwordInput="ngModel" required minlength="8"
+                    [class.is-invalid]="passwordInput.invalid && (passwordInput.touched || loginForm.submitted)">
+                  <button type="button" class="btn btn-outline-secondary" (click)="showPassword = !showPassword"
+                    [attr.aria-label]="showPassword ? 'Hide password' : 'Show password'">
+                    <i class="bi" [ngClass]="showPassword ? 'bi-eye-slash' : 'bi-eye'"></i>
+                  </button>
+                  <div class="invalid-feedback">Password must be at least 8 characters.</div>
+                </div>
+              </div>
+
+              <button type="submit" class="btn btn-primary w-100 py-2" [disabled]="loginForm.invalid || saving">
+                <span class="spinner-border spinner-border-sm me-2" *ngIf="saving" aria-hidden="true"></span>
+                {{ saving ? 'Logging in...' : 'Log in' }}
+              </button>
+
+            </form>
+
+            <p class="text-center text-body-secondary mt-4 mb-0">
+              New here?
+              <a routerLink="/register" class="fw-semibold">Create an account</a>
+            </p>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+</div>

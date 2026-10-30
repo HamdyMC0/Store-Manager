@@ -1,0 +1,61 @@
+<article class="card h-100 border-0 shadow-sm overflow-hidden">
+
+  <div class="position-relative bg-white border-bottom">
+    <a [routerLink]="preview ? null : ['/products', product.id]" class="d-block">
+      <div class="ratio ratio-4x3">
+        <img *ngIf="product.image && !imageFailed; else noImage"
+          class="object-fit-contain p-4" [src]="product.image" [alt]="product.title"
+          [ngClass]="{ 'opacity-50': outOfStock }"
+          [ngStyle]="{ 'filter': outOfStock ? 'grayscale(100%)' : 'none' }"
+          (error)="imageFailed = true">
+        <ng-template #noImage>
+          <div class="d-flex flex-column align-items-center justify-content-center text-secondary">
+            <i class="bi bi-image fs-1"></i>
+            <span class="small">No image</span>
+          </div>
+        </ng-template>
+      </div>
+    </a>
+    <span class="badge text-bg-danger position-absolute top-0 start-0 m-3" *ngIf="outOfStock">Out of stock</span>
+    <span class="badge text-bg-success position-absolute top-0 end-0 m-3" *ngIf="isNew && !outOfStock">New</span>
+  </div>
+
+  <div class="card-body d-flex flex-column">
+    <div class="d-flex flex-wrap gap-1 mb-2">
+      <span class="badge bg-primary-subtle text-primary-emphasis">{{ product.category | uppercase }}</span>
+      <span class="badge bg-body-secondary text-body-secondary" *ngIf="product.subcategory">{{ product.subcategory }}</span>
+    </div>
+
+    <h2 class="h6 card-title text-truncate mb-2" [title]="product.title">
+      <a [routerLink]="preview ? null : ['/products', product.id]"
+        class="link-body-emphasis link-underline-opacity-0 link-underline-opacity-100-hover">{{ product.title || 'Product title' }}</a>
+    </h2>
+
+    <p class="card-text text-body-secondary small">{{ product.description | truncate:80 }}</p>
+
+    <div class="mt-auto pt-2">
+      <div class="d-flex justify-content-between align-items-baseline">
+        <span class="fs-4 fw-bold">{{ product.price | currency }}</span>
+        <span class="small fw-semibold" [ngClass]="outOfStock ? 'text-danger-emphasis' : lowStock ? 'text-warning-emphasis' : 'text-success-emphasis'">
+          {{ outOfStock ? 'Out of stock' : lowStock ? 'Only ' + product.stock + ' left' : product.stock + ' in stock' }}
+        </span>
+      </div>
+      <p class="small text-body-secondary mb-0 mt-1">Added on {{ product.createdAt | date:'mediumDate' }}</p>
+    </div>
+  </div>
+
+  <div class="card-footer bg-transparent border-0 d-flex gap-2 pt-0 pb-3 px-3" *ngIf="!preview">
+    <a [routerLink]="['/products', product.id]" class="btn btn-outline-primary btn-sm flex-fill">
+      <i class="bi bi-eye me-1"></i>Details
+    </a>
+    <ng-container *ngIf="canManage">
+      <a [routerLink]="['/edit-product', product.id]" class="btn btn-outline-secondary btn-sm flex-fill">
+        <i class="bi bi-pencil me-1"></i>Edit
+      </a>
+      <button type="button" class="btn btn-outline-danger btn-sm" (click)="onDelete()" aria-label="Delete product" title="Delete">
+        <i class="bi bi-trash"></i>
+      </button>
+    </ng-container>
+  </div>
+
+</article>

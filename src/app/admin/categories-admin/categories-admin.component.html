@@ -1,0 +1,169 @@
+<nav aria-label="breadcrumb">
+  <ol class="breadcrumb">
+    <li class="breadcrumb-item"><a routerLink="/" class="link-body-emphasis link-underline-opacity-0 link-underline-opacity-100-hover">Home</a></li>
+    <li class="breadcrumb-item">Admin</li>
+    <li class="breadcrumb-item active" aria-current="page">Categories</li>
+  </ol>
+</nav>
+
+<div class="mb-4">
+  <h1 class="h2 fw-bold mb-1">Categories</h1>
+  <p class="text-body-secondary mb-0">Create and organize the categories and subcategories of your store.</p>
+</div>
+
+<app-loading-spinner *ngIf="loading" message="Loading categories..."></app-loading-spinner>
+
+<app-error-message *ngIf="!loading && errorMessage" [message]="errorMessage" (retry)="loadAll()"></app-error-message>
+
+<div class="row g-4" *ngIf="!loading && !errorMessage">
+
+  <!-- categories -->
+  <div class="col-lg-6">
+    <div class="card border-0 shadow-sm h-100">
+      <div class="card-header d-flex justify-content-between align-items-center py-3">
+        <h2 class="h5 fw-bold mb-0"><i class="bi bi-tags me-2 text-primary"></i>Categories</h2>
+        <span class="badge text-bg-secondary">{{ categories.length }}</span>
+      </div>
+
+      <div class="card-body">
+        <form #catForm="ngForm" (ngSubmit)="saveCategory(catForm, catFile)" novalidate>
+
+          <p class="small fw-semibold text-body-secondary text-uppercase mb-3">{{ catEditId ? 'Edit category' : 'New category' }}</p>
+
+          <div class="alert alert-danger py-2" role="alert" *ngIf="catError">{{ catError }}</div>
+
+          <div class="mb-3">
+            <label for="catName" class="form-label fw-semibold">Name</label>
+            <input id="catName" name="catName" type="text" class="form-control" placeholder="e.g. Electronics"
+              [(ngModel)]="catName" #catNameInput="ngModel" required minlength="3"
+              [class.is-invalid]="catNameInput.invalid && (catNameInput.touched || catForm.submitted)">
+            <div class="invalid-feedback">The name is required (at least 3 characters).</div>
+          </div>
+
+          <div class="mb-3">
+            <label for="catImage" class="form-label fw-semibold">
+              Picture <span class="text-body-secondary fw-normal" *ngIf="catEditId">(leave it empty to keep the current one)</span>
+            </label>
+            <div class="d-flex align-items-center gap-3">
+              <img *ngIf="catPreview || catCurrentImage" [src]="catPreview || catCurrentImage" alt="Category picture"
+                width="56" height="56" class="rounded border object-fit-cover flex-shrink-0">
+              <div class="flex-grow-1">
+                <input id="catImage" type="file" accept="image/*" class="form-control" #catFile
+                  [class.is-invalid]="catImageError" (change)="onCategoryFile($event)">
+                <div class="invalid-feedback">{{ catImageError }}</div>
+              </div>
+            </div>
+          </div>
+
+          <div class="d-flex gap-2">
+            <button type="submit" class="btn btn-primary" [disabled]="catForm.invalid || catSaving">
+              <span class="spinner-border spinner-border-sm me-2" *ngIf="catSaving" aria-hidden="true"></span>
+              {{ catSaving ? 'Saving...' : (catEditId ? 'Save changes' : 'Add category') }}
+            </button>
+            <button type="button" class="btn btn-outline-secondary" *ngIf="catEditId" (click)="resetCategoryForm(catForm, catFile)">Cancel</button>
+          </div>
+        </form>
+      </div>
+
+      <ul class="list-group list-group-flush border-top">
+        <li class="list-group-item d-flex align-items-center gap-3 py-3" *ngFor="let c of categories">
+          <img *ngIf="c.image" [src]="c.image" [alt]="c.name" width="48" height="48" class="rounded border object-fit-cover flex-shrink-0">
+          <span *ngIf="!c.image" class="d-inline-flex align-items-center justify-content-center rounded border text-body-secondary flex-shrink-0 px-3 py-2">
+            <i class="bi bi-tag"></i>
+          </span>
+          <div class="flex-grow-1">
+            <div class="fw-semibold">{{ c.name }}</div>
+            <div class="small text-body-secondary">{{ countSubcategories(c.name) }} subcategories</div>
+          </div>
+          <button type="button" class="btn btn-outline-secondary btn-sm" (click)="startEditCategory(c)" [attr.aria-label]="'Edit ' + c.name">
+            <i class="bi bi-pencil"></i>
+          </button>
+          <button type="button" class="btn btn-outline-danger btn-sm" (click)="askToDelete('category', c.id, c.name)" [attr.aria-label]="'Delete ' + c.name">
+            <i class="bi bi-trash"></i>
+          </button>
+        </li>
+        <li class="list-group-item text-center text-body-secondary py-4" *ngIf="categories.length === 0">
+          <i class="bi bi-inboxes fs-3 d-block mb-1"></i>No categories yet. Add the first one above.
+        </li>
+      </ul>
+    </div>
+  </div>
+
+  <!-- subcategories -->
+  <div class="col-lg-6">
+    <div class="card border-0 shadow-sm h-100">
+      <div class="card-header d-flex justify-content-between align-items-center py-3">
+        <h2 class="h5 fw-bold mb-0"><i class="bi bi-diagram-2 me-2 text-primary"></i>Subcategories</h2>
+        <span class="badge text-bg-secondary">{{ subcategories.length }}</span>
+      </div>
+
+      <div class="card-body">
+        <form #subForm="ngForm" (ngSubmit)="saveSubcategory(subForm)" novalidate>
+
+          <p class="small fw-semibold text-body-secondary text-uppercase mb-3">{{ subEditId ? 'Edit subcategory' : 'New subcategory' }}</p>
+
+          <div class="alert alert-danger py-2" role="alert" *ngIf="subError">{{ subError }}</div>
+
+          <div class="mb-3">
+            <label for="subName" class="form-label fw-semibold">Name</label>
+            <input id="subName" name="subName" type="text" class="form-control" placeholder="e.g. Phones"
+              [(ngModel)]="subName" #subNameInput="ngModel" required minlength="3"
+              [class.is-invalid]="subNameInput.invalid && (subNameInput.touched || subForm.submitted)">
+            <div class="invalid-feedback">The name is required (at least 3 characters).</div>
+          </div>
+
+          <div class="mb-3">
+            <label for="subCategoryId" class="form-label fw-semibold">Category</label>
+            <select id="subCategoryId" name="subCategoryId" class="form-select"
+              [(ngModel)]="subCategoryId" #subCategoryInput="ngModel" required
+              [class.is-invalid]="subCategoryInput.invalid && (subCategoryInput.touched || subForm.submitted)">
+              <option value="" disabled>Select a category</option>
+              <option *ngFor="let c of categories" [value]="c.id">{{ c.name }}</option>
+            </select>
+            <div class="invalid-feedback">Please choose the category it belongs to.</div>
+          </div>
+
+          <div class="d-flex gap-2">
+            <button type="submit" class="btn btn-primary" [disabled]="subForm.invalid || subSaving">
+              <span class="spinner-border spinner-border-sm me-2" *ngIf="subSaving" aria-hidden="true"></span>
+              {{ subSaving ? 'Saving...' : (subEditId ? 'Save changes' : 'Add subcategory') }}
+            </button>
+            <button type="button" class="btn btn-outline-secondary" *ngIf="subEditId" (click)="resetSubcategoryForm(subForm)">Cancel</button>
+          </div>
+        </form>
+      </div>
+
+      <ul class="list-group list-group-flush border-top">
+        <li class="list-group-item d-flex align-items-center gap-3 py-3" *ngFor="let s of subcategories">
+          <div class="flex-grow-1">
+            <div class="fw-semibold">{{ s.name }}</div>
+            <span class="badge bg-primary-subtle text-primary-emphasis">{{ s.categoryName || 'No category' }}</span>
+          </div>
+          <button type="button" class="btn btn-outline-secondary btn-sm" (click)="startEditSubcategory(s)" [attr.aria-label]="'Edit ' + s.name">
+            <i class="bi bi-pencil"></i>
+          </button>
+          <button type="button" class="btn btn-outline-danger btn-sm" (click)="askToDelete('subcategory', s.id, s.name)" [attr.aria-label]="'Delete ' + s.name">
+            <i class="bi bi-trash"></i>
+          </button>
+        </li>
+        <li class="list-group-item text-center text-body-secondary py-4" *ngIf="subcategories.length === 0">
+          <i class="bi bi-inboxes fs-3 d-block mb-1"></i>No subcategories yet.
+        </li>
+      </ul>
+    </div>
+  </div>
+
+</div>
+
+<!-- delete confirmation modal -->
+<app-confirm-modal *ngIf="deleteTarget"
+  [title]="deleteTarget.type === 'category' ? 'Delete category' : 'Delete subcategory'"
+  [message]="deleteTarget.type === 'category'
+    ? 'All the subcategories of this category will be deleted too. The products stay, but they will have no category.'
+    : 'Are you sure you want to delete this subcategory?'"
+  [detail]="deleteTarget.name"
+  confirmText="Delete"
+  [busy]="deleting"
+  (confirm)="confirmDelete()"
+  (cancel)="cancelDelete()">
+</app-confirm-modal>
