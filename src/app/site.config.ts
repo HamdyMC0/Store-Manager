@@ -11,7 +11,7 @@ export const SITE = {
   },
 
   contact: {
-    email: 'hamdyakila90@example.com',
+    email: 'hamdyakila90@gmail.com',
     phone: '+20 1032638917',
     location: 'Egypt',
     hours: 'Sat - Thu, 10:00 - 18:00'
